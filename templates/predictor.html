@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predittore Prezzo Auto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4ac1e6 0%, #19a791 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+            min-width: 200px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9ff, #e8eaff);
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .price {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            margin-top: 30px;
+            height: 300px; /* Increased height for better visibility */
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .price {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Predittore Prezzo Auto</h1>
+        <p class="subtitle">Inserisci i chilometri per ottenere una stima del prezzo</p>
+        
+        <div class="input-group">
+            <label for="kilometers">Chilometri percorsi:</label>
+            <input type="number" id="kilometers" placeholder="es. 50000" min="0" max="300000" step="1000">
+        </div>
+        
+        <button onclick="predictPrice()">Calcola Prezzo</button>
+        
+        <div id="result" class="result">
+            <div class="price" id="predicted-price">€ 0</div>
+            <p>Prezzo stimato per la tua auto</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="coefficient">0.00</div>
+                    <div class="stat-label">Coefficiente</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="intercept">0.00</div>
+                    <div class="stat-label">Intercetta</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let priceChart; // Declare chart variable globally
+
+        async function predictPrice() {
+            const kilometers = document.getElementById('kilometers').value;
+            if (!kilometers) {
+                alert('Please enter kilometers.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ kilometers: parseFloat(kilometers) })
+                });
+
+                const data = await response.json();
+                document.getElementById('predicted-price').textContent = '€ ' + Math.round(data.predicted_price).toLocaleString('it-IT');
+                document.getElementById('coefficient').textContent = data.coefficient.toFixed(4);
+                document.getElementById('intercept').textContent = data.intercept.toFixed(4);
+
+                const resultDiv = document.getElementById('result');
+                resultDiv.classList.add('show');
+
+                // Update or create the chart
+                updateChart(data.scatter_data, data.regression_line_data);
+
+            } catch (error) {
+                console.error('Error predicting price:', error);
+                alert('Error predicting price. Please try again.');
+            }
+        }
+
+        function updateChart(scatterData, regressionLineData) {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+
+            if (priceChart) {
+                priceChart.destroy(); // Destroy existing chart before creating a new one
+            }
+
+            priceChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Dati Reali (Simulati)',
+                            data: scatterData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            pointRadius: 3
+                        },
+                        {
+                            label: 'Retta di Regressione',
+                            data: regressionLineData,
+                            type: 'line',
+                            borderColor: 'red',
+                            backgroundColor: 'transparent',
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            title: {
+                                display: true,
+                                text: 'Chilometri (km)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Prezzo (€)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Prezzo Auto vs. Chilometri con Regressione Lineare'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gestisci invio con Enter
+        document.getElementById('kilometers').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                predictPrice();
+            }
+        });
+
+        // Initial chart load (optional, if you want to show an empty chart or initial data)
+        // You might want to fetch initial data from the server here if needed
+        // For now, we'll just ensure the chart container is ready.
+        // updateChart([], []); // Call with empty data to initialize an empty chart
+
+    </script>
+</body>
+</html>
