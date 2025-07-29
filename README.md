@@ -1,6 +1,9 @@
-# Predittore Prezzo Auto
+# Predittore Prezzo Auto - Realizzato con Trae
 
 Questo progetto implementa un predittore del prezzo delle auto basato sui chilometri percorsi, utilizzando un modello di regressione lineare. L'applicazione è composta da un backend Flask che serve un'interfaccia web e gestisce le previsioni, e un frontend HTML/CSS/JavaScript che visualizza i risultati e un grafico interattivo.
+
+
+![KM](https://github.com/user-attachments/assets/f43aaf22-54b2-4cbe-9fe5-2655d40f5d3f)
 
 ## Caratteristiche
 
@@ -90,3 +93,9 @@ Qui potrai inserire i chilometri e ottenere una previsione del prezzo dell'auto,
 - **`ModuleNotFoundError`**: Assicurati di aver attivato l'ambiente virtuale e installato tutte le dipendenze (`pip install ...`).
 - **`TemplateNotFound: predictor.html`**: Assicurati che `predictor.html` si trovi nella cartella `templates` all'interno della directory del progetto.
 - **Previsione non risponde / Grafico non appare**: Verifica la console del browser per errori JavaScript e la console del server Flask per errori Python. Assicurati che il file `predictor.html` sia stato aggiornato con il codice più recente fornito.
+
+
+
+
+
+
