@@ -1,4 +1,4 @@
-# Predittore Prezzo Auto - Realizzato con Trae
+# Predittore Prezzo Auto 
 
 Questo progetto implementa un predittore del prezzo delle auto basato sui chilometri percorsi, utilizzando un modello di regressione lineare. L'applicazione è composta da un backend Flask che serve un'interfaccia web e gestisce le previsioni, e un frontend HTML/CSS/JavaScript che visualizza i risultati e un grafico interattivo.
 
